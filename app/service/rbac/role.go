@@ -1,0 +1,5 @@
+package rbac
+
+func aaa() {
+
+}

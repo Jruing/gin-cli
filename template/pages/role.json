@@ -1,0 +1,825 @@
+{
+  "type": "page",
+  "title": "角色配置页面",
+  "toolbar": [
+    {
+      "type": "button",
+      "actionType": "dialog",
+      "label": "新增",
+      "icon": "fa fa-plus pull-left",
+      "primary": true,
+      "dialog": {
+        "title": "新增",
+        "body": {
+          "type": "form",
+          "name": "sample-edit-form",
+          "api": "post:/amis/api/sample",
+          "body": [
+            {
+              "type": "input-text",
+              "name": "engine",
+              "label": "Engine",
+              "required": true
+            },
+            {
+              "type": "divider"
+            },
+            {
+              "type": "input-text",
+              "name": "browser",
+              "label": "Browser",
+              "required": true
+            },
+            {
+              "type": "divider"
+            },
+            {
+              "type": "input-text",
+              "name": "platform",
+              "label": "Platform(s)",
+              "required": true
+            },
+            {
+              "type": "divider"
+            },
+            {
+              "type": "input-text",
+              "name": "version",
+              "label": "Engine version"
+            },
+            {
+              "type": "divider"
+            },
+            {
+              "type": "input-text",
+              "name": "grade",
+              "label": "CSS grade"
+            }
+          ]
+        }
+      },
+      "id": "u:4de26ce15da7"
+    }
+  ],
+  "body": [
+    {
+      "type": "crud",
+      "draggable": true,
+      "api": {
+        "method": "get",
+        "url": "/getuser"
+      },
+      "perPage": 15,
+      "keepItemSelectionOnPageChange": true,
+      "maxKeepItemSelectionLength": 11,
+      "labelTpl": "${id} ${engine}",
+      "orderBy": "id",
+      "orderDir": "asc",
+      "filter": {
+        "title": "条件搜索",
+        "submitText": "",
+        "body": [
+          {
+            "type": "input-text",
+            "label": "角色名",
+            "name": "username",
+            "id": "u:c819c3ae5c15",
+            "visible": true,
+            "validateOnChange": false
+          },
+          {
+            "type": "select",
+            "label": "状态",
+            "name": "status",
+            "options": [
+              {
+                "label": "有效",
+                "value": 1
+              },
+              {
+                "label": "无效",
+                "value": 0
+              }
+            ],
+            "id": "u:e46c4260c81d",
+            "multiple": false,
+            "validateOnChange": false,
+            "showInvalidMatch": false
+          }
+        ],
+        "id": "u:348f03772ee7",
+        "actions": [
+          {
+            "type": "submit",
+            "label": "查询",
+            "primary": true,
+            "id": "u:96da0f87dd89"
+          }
+        ],
+        "feat": "Insert",
+        "labelAlign": "left",
+        "autoFocus": true
+      },
+      "bulkActions": [
+        {
+          "label": "批量删除",
+          "actionType": "ajax",
+          "api": "delete:/amis/api/sample/${ids|raw}",
+          "confirmText": "确定要批量删除?",
+          "id": "u:7fa961608bc8"
+        },
+        {
+          "label": "批量修改",
+          "actionType": "dialog",
+          "dialog": {
+            "title": "批量编辑",
+            "name": "sample-bulk-edit",
+            "body": {
+              "type": "form",
+              "api": "/amis/api/sample/bulkUpdate2",
+              "body": [
+                {
+                  "type": "hidden",
+                  "name": "ids"
+                },
+                {
+                  "type": "input-text",
+                  "name": "engine",
+                  "label": "Engine"
+                }
+              ]
+            }
+          },
+          "id": "u:58c8fbbc0614"
+        }
+      ],
+      "quickSaveApi": "",
+      "quickSaveItemApi": "/amis/api/sample/$id",
+      "filterTogglable": true,
+      "headerToolbar": [
+        {
+          "label": "新增",
+          "type": "button",
+          "actionType": "dialog",
+          "level": "primary",
+          "editorSetting": {
+            "behavior": "create"
+          },
+          "dialog": {
+            "title": "新增",
+            "body": {
+              "type": "form",
+              "api": {
+                "method": "post",
+                "url": "/amis/api/sample?waitSeconds=1"
+              },
+              "body": [
+                {
+                  "type": "input-text",
+                  "name": "id",
+                  "label": "ID"
+                },
+                {
+                  "type": "input-text",
+                  "name": "username",
+                  "label": "用户名"
+                },
+                {
+                  "type": "input-text",
+                  "name": "passwd",
+                  "label": "密码"
+                },
+                {
+                  "type": "input-text",
+                  "name": "telephone",
+                  "label": "手机号码"
+                },
+                {
+                  "type": "select",
+                  "name": "status",
+                  "label": "状态"
+                }
+              ]
+            }
+          },
+          "id": "u:c2bcc3b5c485"
+        },
+        "bulkActions"
+      ],
+      "footerToolbar": [
+        "statistics",
+        "switch-per-page",
+        "pagination"
+      ],
+      "id": "u:b5117a304121",
+      "perPageAvailable": [
+        10,
+        20,
+        50,
+        75,
+        100
+      ],
+      "messages": {
+        "fetchSuccess": ""
+      },
+      "perPageField": "perPage",
+      "autoJumpToTopOnPagerChange": true,
+      "initFetch": true,
+      "onEvent": {
+        "columnFilter": {
+          "weight": 0,
+          "actions": []
+        }
+      },
+      "columns": [
+        {
+          "name": "id",
+          "label": "ID",
+          "sortable": true,
+          "type": "text",
+          "toggled": true,
+          "remark": "Bla bla Bla",
+          "id": "u:9b51b21aac7f",
+          "placeholder": "-"
+        },
+        {
+          "name": "username",
+          "label": "用户名",
+          "sortable": true,
+          "searchable": true,
+          "popOver": {
+            "body": "Popover 内容：${platform}",
+            "trigger": "hover"
+          },
+          "popOverEnableOn": "this.id === 1",
+          "type": "text",
+          "toggled": true,
+          "id": "u:2be1e81ee9cf",
+          "placeholder": "-"
+        },
+        {
+          "name": "telephone",
+          "label": "手机号码",
+          "quickEdit": true,
+          "type": "text",
+          "toggled": true,
+          "filterable": {
+            "options": [
+              {
+                "label": "4",
+                "value": "4"
+              },
+              {
+                "label": "5",
+                "value": "5"
+              },
+              {
+                "label": "6",
+                "value": "6"
+              }
+            ]
+          },
+          "classNameExpr": "<%= data.version < 5 ? 'bg-danger' : '' %>",
+          "id": "u:d63cac21518f"
+        },
+        {
+          "type": "mapping",
+          "name": "status",
+          "label": "状态",
+          "quickEdit": {
+            "saveImmediately": true,
+            "mode": "inline",
+            "type": "select",
+            "options": [
+              "A",
+              "B",
+              "C",
+              "D",
+              "X"
+            ],
+            "id": "u:d256d1670027"
+          },
+          "id": "u:66b68ff89b12"
+        },
+        {
+          "type": "operation",
+          "label": "操作",
+          "width": 100,
+          "buttons": [
+            {
+              "type": "button",
+              "icon": "fa fa-eye",
+              "actionType": "dialog",
+              "tooltip": "查看",
+              "dialog": {
+                "title": "查看",
+                "body": {
+                  "type": "form",
+                  "body": [
+                    {
+                      "type": "static",
+                      "name": "engine",
+                      "label": "Engine"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "browser",
+                      "label": "Browser"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "platform",
+                      "label": "Platform(s)"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "version",
+                      "label": "Engine version"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "grade",
+                      "label": "CSS grade"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "html",
+                      "html": "<p>添加其他 <span>Html 片段</span> 需要支持变量替换（todo）.</p>"
+                    }
+                  ]
+                }
+              },
+              "id": "u:20c40d19bab0"
+            },
+            {
+              "type": "button",
+              "icon": "fa fa-pencil",
+              "tooltip": "编辑",
+              "actionType": "drawer",
+              "drawer": {
+                "position": "left",
+                "size": "lg",
+                "title": "编辑",
+                "body": {
+                  "type": "form",
+                  "name": "sample-edit-form",
+                  "data": {
+                    "env": "test"
+                  },
+                  "api": {
+                    "method": "post",
+                    "url": "/amis/api/sample/$id",
+                    "messages": {
+                      "success": "成功了-${env}"
+                    }
+                  },
+                  "body": [
+                    {
+                      "type": "input-text",
+                      "name": "engine",
+                      "label": "Engine",
+                      "required": true
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "input-text",
+                      "name": "browser",
+                      "label": "Browser",
+                      "required": true
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "input-text",
+                      "name": "platform",
+                      "label": "Platform(s)",
+                      "required": true
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "input-text",
+                      "name": "version",
+                      "label": "Engine version"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "select",
+                      "name": "grade",
+                      "label": "CSS grade",
+                      "options": [
+                        "A",
+                        "B",
+                        "C",
+                        "D",
+                        "X"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "id": "u:a5d89c5d67a4"
+            },
+            {
+              "type": "button",
+              "icon": "fa fa-times text-danger",
+              "actionType": "ajax",
+              "tooltip": "删除",
+              "confirmText": "您确认要删除?",
+              "api": "delete:/amis/api/sample/$id",
+              "id": "u:cfdf042a27e4"
+            },
+            {
+              "label": "编辑",
+              "type": "button",
+              "actionType": "dialog",
+              "level": "link",
+              "editorSetting": {
+                "behavior": "update"
+              },
+              "dialog": {
+                "title": "编辑",
+                "body": {
+                  "type": "form",
+                  "api": "",
+                  "initApi": "",
+                  "body": [
+                    {
+                      "name": "id",
+                      "label": "ID",
+                      "sortable": true,
+                      "toggled": true,
+                      "remark": "Bla bla Bla",
+                      "id": "u:5b47e764834c",
+                      "type": "input-text"
+                    },
+                    {
+                      "name": "username",
+                      "label": "用户名",
+                      "sortable": true,
+                      "searchable": true,
+                      "popOver": {
+                        "body": "Popover 内容：${platform}",
+                        "trigger": "hover"
+                      },
+                      "popOverEnableOn": "this.id === 1",
+                      "toggled": true,
+                      "id": "u:b2dafc511814",
+                      "placeholder": "-",
+                      "type": "input-text"
+                    },
+                    {
+                      "name": "passwd",
+                      "label": "密码",
+                      "sortable": true,
+                      "toggled": false,
+                      "id": "u:2f208253813a",
+                      "placeholder": "-",
+                      "type": "input-text"
+                    },
+                    {
+                      "name": "telephone",
+                      "label": "手机号码",
+                      "quickEdit": true,
+                      "toggled": true,
+                      "filterable": {
+                        "options": [
+                          {
+                            "label": "4",
+                            "value": "4"
+                          },
+                          {
+                            "label": "5",
+                            "value": "5"
+                          },
+                          {
+                            "label": "6",
+                            "value": "6"
+                          }
+                        ]
+                      },
+                      "classNameExpr": "<%= data.version < 5 ? 'bg-danger' : '' %>",
+                      "id": "u:f2cec526b048",
+                      "type": "input-text"
+                    },
+                    {
+                      "name": "status",
+                      "label": "状态",
+                      "quickEdit": {
+                        "saveImmediately": true,
+                        "mode": "inline",
+                        "type": "select",
+                        "options": [
+                          "A",
+                          "B",
+                          "C",
+                          "D",
+                          "X"
+                        ],
+                        "id": "u:d677a4d5b729"
+                      },
+                      "id": "u:8e76df72eb9b",
+                      "type": "select"
+                    }
+                  ]
+                }
+              },
+              "id": "u:0eab9393891c"
+            },
+            {
+              "label": "查看",
+              "type": "button",
+              "actionType": "dialog",
+              "level": "link",
+              "editorSetting": {
+                "behavior": "view"
+              },
+              "dialog": {
+                "title": "查看详情",
+                "body": {
+                  "type": "form",
+                  "initApi": "",
+                  "body": [
+                    {
+                      "name": "id",
+                      "label": "ID",
+                      "sortable": true,
+                      "toggled": true,
+                      "remark": "Bla bla Bla",
+                      "id": "u:e020b4c5a85c",
+                      "type": "static"
+                    },
+                    {
+                      "name": "username",
+                      "label": "用户名",
+                      "sortable": true,
+                      "searchable": true,
+                      "popOver": {
+                        "body": "Popover 内容：${platform}",
+                        "trigger": "hover"
+                      },
+                      "popOverEnableOn": "this.id === 1",
+                      "toggled": true,
+                      "id": "u:a116bac88104",
+                      "placeholder": "-",
+                      "type": "static"
+                    },
+                    {
+                      "name": "passwd",
+                      "label": "密码",
+                      "sortable": true,
+                      "toggled": false,
+                      "id": "u:f42b8e49d493",
+                      "placeholder": "-",
+                      "type": "static"
+                    },
+                    {
+                      "name": "telephone",
+                      "label": "手机号码",
+                      "quickEdit": true,
+                      "toggled": true,
+                      "filterable": {
+                        "options": [
+                          {
+                            "label": "4",
+                            "value": "4"
+                          },
+                          {
+                            "label": "5",
+                            "value": "5"
+                          },
+                          {
+                            "label": "6",
+                            "value": "6"
+                          }
+                        ]
+                      },
+                      "classNameExpr": "<%= data.version < 5 ? 'bg-danger' : '' %>",
+                      "id": "u:b82c100bec2d",
+                      "type": "static"
+                    },
+                    {
+                      "name": "status",
+                      "label": "状态",
+                      "quickEdit": {
+                        "saveImmediately": true,
+                        "mode": "inline",
+                        "type": "select",
+                        "options": [
+                          "A",
+                          "B",
+                          "C",
+                          "D",
+                          "X"
+                        ],
+                        "id": "u:d9fa8daa909f"
+                      },
+                      "id": "u:aad59db37057",
+                      "type": "static"
+                    },
+                    {
+                      "label": "操作",
+                      "width": 100,
+                      "buttons": [
+                        {
+                          "type": "button",
+                          "icon": "fa fa-eye",
+                          "actionType": "dialog",
+                          "tooltip": "查看",
+                          "dialog": {
+                            "title": "查看",
+                            "body": {
+                              "type": "form",
+                              "body": [
+                                {
+                                  "type": "static",
+                                  "name": "engine",
+                                  "label": "Engine"
+                                },
+                                {
+                                  "type": "divider"
+                                },
+                                {
+                                  "type": "static",
+                                  "name": "browser",
+                                  "label": "Browser"
+                                },
+                                {
+                                  "type": "divider"
+                                },
+                                {
+                                  "type": "static",
+                                  "name": "platform",
+                                  "label": "Platform(s)"
+                                },
+                                {
+                                  "type": "divider"
+                                },
+                                {
+                                  "type": "static",
+                                  "name": "version",
+                                  "label": "Engine version"
+                                },
+                                {
+                                  "type": "divider"
+                                },
+                                {
+                                  "type": "static",
+                                  "name": "grade",
+                                  "label": "CSS grade"
+                                },
+                                {
+                                  "type": "divider"
+                                },
+                                {
+                                  "type": "html",
+                                  "html": "<p>添加其他 <span>Html 片段</span> 需要支持变量替换（todo）.</p>"
+                                }
+                              ]
+                            }
+                          },
+                          "id": "u:da5bdba2bb15"
+                        },
+                        {
+                          "type": "button",
+                          "icon": "fa fa-pencil",
+                          "tooltip": "编辑",
+                          "actionType": "drawer",
+                          "drawer": {
+                            "position": "left",
+                            "size": "lg",
+                            "title": "编辑",
+                            "body": {
+                              "type": "form",
+                              "name": "sample-edit-form",
+                              "data": {
+                                "env": "test"
+                              },
+                              "api": {
+                                "method": "post",
+                                "url": "/amis/api/sample/$id",
+                                "messages": {
+                                  "success": "成功了-${env}"
+                                }
+                              },
+                              "body": [
+                                {
+                                  "type": "input-text",
+                                  "name": "engine",
+                                  "label": "Engine",
+                                  "required": true
+                                },
+                                {
+                                  "type": "divider"
+                                },
+                                {
+                                  "type": "input-text",
+                                  "name": "browser",
+                                  "label": "Browser",
+                                  "required": true
+                                },
+                                {
+                                  "type": "divider"
+                                },
+                                {
+                                  "type": "input-text",
+                                  "name": "platform",
+                                  "label": "Platform(s)",
+                                  "required": true
+                                },
+                                {
+                                  "type": "divider"
+                                },
+                                {
+                                  "type": "input-text",
+                                  "name": "version",
+                                  "label": "Engine version"
+                                },
+                                {
+                                  "type": "divider"
+                                },
+                                {
+                                  "type": "select",
+                                  "name": "grade",
+                                  "label": "CSS grade",
+                                  "options": [
+                                    "A",
+                                    "B",
+                                    "C",
+                                    "D",
+                                    "X"
+                                  ]
+                                }
+                              ]
+                            }
+                          },
+                          "id": "u:7b8aa11bae7a"
+                        },
+                        {
+                          "type": "button",
+                          "icon": "fa fa-times text-danger",
+                          "actionType": "ajax",
+                          "tooltip": "删除",
+                          "confirmText": "您确认要删除?",
+                          "api": "delete:/amis/api/sample/$id",
+                          "id": "u:97c2c42ce010"
+                        }
+                      ],
+                      "toggled": true,
+                      "id": "u:cb2dbadb38d4",
+                      "type": "static"
+                    }
+                  ]
+                }
+              },
+              "id": "u:5e1c07c62068"
+            },
+            {
+              "type": "button",
+              "label": "删除",
+              "actionType": "ajax",
+              "level": "link",
+              "className": "text-danger",
+              "confirmText": "确定要删除？",
+              "api": {
+                "method": "post",
+                "url": "/amis/api/sample?waitSeconds=1"
+              },
+              "editorSetting": {
+                "behavior": "delete"
+              },
+              "id": "u:4c4ff2d5ff32"
+            }
+          ],
+          "toggled": true,
+          "id": "u:cb2dbadb38d4"
+        }
+      ]
+    }
+  ],
+  "id": "u:b38d5a613bf9",
+  "asideResizor": false,
+  "pullRefresh": {
+    "disabled": true
+  }
+}

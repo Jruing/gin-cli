@@ -1,0 +1,17 @@
+[postgres]
+host = "localhost"
+port = 5432
+user = "admin"
+password = "password"
+
+[mysql]
+host = "localhost"
+port = 5432
+user = "admin"
+password = "password"
+
+[redis]
+host = "localhost"
+port = 5432
+password = "password"
+db = 0

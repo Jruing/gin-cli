@@ -1,0 +1,13 @@
+version: '3'
+
+env:
+  ENV: windows
+  OUTPUT: server
+
+tasks:
+  build:
+    cmds:
+      - echo '切换系统环境'
+      - go env -w GOOS=$ENV
+      - go build -o $OUTPUT ../cmd/main.go
+      - echo '构建完成'
