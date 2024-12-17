@@ -30,7 +30,7 @@ func (q *Queries) CheckUser(ctx context.Context, arg CheckUserParams) (int64, er
 	return count, err
 }
 
-const createUser = `-- name: CreateUser :one
+const createUser = `-- name: CreateUser :exec
 INSERT INTO Users (nickname, username, password, sex, email, status, created)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING id, nickname, username, password, sex, email, status, created
@@ -46,8 +46,8 @@ type CreateUserParams struct {
 	Created  pgtype.Timestamp
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser,
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
+	_, err := q.db.Exec(ctx, createUser,
 		arg.Nickname,
 		arg.Username,
 		arg.Password,
@@ -56,18 +56,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Status,
 		arg.Created,
 	)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Nickname,
-		&i.Username,
-		&i.Password,
-		&i.Sex,
-		&i.Email,
-		&i.Status,
-		&i.Created,
-	)
-	return i, err
+	return err
 }
 
 const deleteUser = `-- name: DeleteUser :exec

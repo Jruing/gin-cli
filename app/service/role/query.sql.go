@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createRole = `-- name: CreateRole :one
+const createRole = `-- name: CreateRole :exec
 INSERT INTO Roles (rolename, status, created)
 VALUES ($1, $2, $3)
 RETURNING id, rolename, status, created
@@ -23,16 +23,9 @@ type CreateRoleParams struct {
 	Created  pgtype.Timestamp
 }
 
-func (q *Queries) CreateRole(ctx context.Context, arg CreateRoleParams) (Role, error) {
-	row := q.db.QueryRow(ctx, createRole, arg.Rolename, arg.Status, arg.Created)
-	var i Role
-	err := row.Scan(
-		&i.ID,
-		&i.Rolename,
-		&i.Status,
-		&i.Created,
-	)
-	return i, err
+func (q *Queries) CreateRole(ctx context.Context, arg CreateRoleParams) error {
+	_, err := q.db.Exec(ctx, createRole, arg.Rolename, arg.Status, arg.Created)
+	return err
 }
 
 const deleteRole = `-- name: DeleteRole :exec

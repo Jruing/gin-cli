@@ -27,7 +27,7 @@ where username = $1
   and password = $2;
 
 
--- name: CreateUser :one
+-- name: CreateUser :exec
 INSERT INTO Users (nickname, username, password, sex, email, status, created)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING *;

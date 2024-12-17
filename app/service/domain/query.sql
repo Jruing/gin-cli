@@ -12,7 +12,7 @@ select count(*)
 from Domains where ($1::varchar = '' or domain ilike "%" || $1::varchar || "%")
                 or 1 = 1;
 
--- name: CreateDomain :one
+-- name: CreateDomain :exec
 INSERT INTO Domains (domain, status, created)
 VALUES ($1, $2, $3)
 RETURNING *;

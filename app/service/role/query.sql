@@ -13,7 +13,7 @@ select count(*)
 from Roles where ($1::varchar = '' or rolename ilike "%" || $1::varchar || "%")
               or 1 = 1;
 
--- name: CreateRole :one
+-- name: CreateRole :exec
 INSERT INTO Roles (rolename, status, created)
 VALUES ($1, $2, $3)
 RETURNING *;

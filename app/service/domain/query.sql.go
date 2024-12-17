@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createDomain = `-- name: CreateDomain :one
+const createDomain = `-- name: CreateDomain :exec
 INSERT INTO Domains (domain, status, created)
 VALUES ($1, $2, $3)
 RETURNING id, domain, status, created
@@ -23,16 +23,9 @@ type CreateDomainParams struct {
 	Created pgtype.Timestamp
 }
 
-func (q *Queries) CreateDomain(ctx context.Context, arg CreateDomainParams) (Domain, error) {
-	row := q.db.QueryRow(ctx, createDomain, arg.Domain, arg.Status, arg.Created)
-	var i Domain
-	err := row.Scan(
-		&i.ID,
-		&i.Domain,
-		&i.Status,
-		&i.Created,
-	)
-	return i, err
+func (q *Queries) CreateDomain(ctx context.Context, arg CreateDomainParams) error {
+	_, err := q.db.Exec(ctx, createDomain, arg.Domain, arg.Status, arg.Created)
+	return err
 }
 
 const deleteDomain = `-- name: DeleteDomain :exec
