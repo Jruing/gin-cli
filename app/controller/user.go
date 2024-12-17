@@ -1,13 +1,14 @@
 package controller
 
 import (
+	"gin-cli/app/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 import "gin-cli/app/service/user"
 
 func CreateUser(c *gin.Context) {
-	db := user.Queries{}
+	db := user.New(utils.Pgconn)
 	params := user.CreateUserParams{
 		Nickname: pgtype.Text{},
 		Username: "",
@@ -24,7 +25,7 @@ func CreateUser(c *gin.Context) {
 }
 
 func UpdateUser(c *gin.Context) {
-	db := user.Queries{}
+	db := user.New(utils.Pgconn)
 	params := user.UpdateUserParams{
 		ID:       0,
 		Nickname: pgtype.Text{},
@@ -41,7 +42,7 @@ func UpdateUser(c *gin.Context) {
 }
 
 func DeleteUser(c *gin.Context) {
-	db := user.Queries{}
+	db := user.New(utils.Pgconn)
 	err := db.DeleteUser(c, 1)
 	if err != nil {
 		return
@@ -52,7 +53,7 @@ func DeleteUser(c *gin.Context) {
 }
 
 func GetUserDetail(c *gin.Context) {
-	db := user.Queries{}
+	db := user.New(utils.Pgconn)
 	params := user.GetUserDetailParams{
 		Column1: "",
 		Column2: "",

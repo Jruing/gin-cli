@@ -2,12 +2,13 @@ package controller
 
 import (
 	"gin-cli/app/service/role"
+	"gin-cli/app/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func CreateRole(c *gin.Context) {
-	db := role.Queries{}
+	db := role.New(utils.Pgconn)
 	params := role.CreateRoleParams{
 		Rolename: "",
 		Status:   0,
@@ -20,7 +21,7 @@ func CreateRole(c *gin.Context) {
 }
 
 func UpdateRole(c *gin.Context) {
-	db := role.Queries{}
+	db := role.New(utils.Pgconn)
 	params := role.UpdateRoleParams{
 		ID:       0,
 		Rolename: "",
@@ -34,7 +35,7 @@ func UpdateRole(c *gin.Context) {
 }
 
 func DeleteRole(c *gin.Context) {
-	db := role.Queries{}
+	db := role.New(utils.Pgconn)
 	err := db.DeleteRole(c, 1)
 	if err != nil {
 		return
@@ -45,7 +46,7 @@ func DeleteRole(c *gin.Context) {
 }
 
 func GetRoleDetail(c *gin.Context) {
-	db := role.Queries{}
+	db := role.New(utils.Pgconn)
 	params := role.GetRoleDetailParams{
 		Limit:  0,
 		Offset: 0,

@@ -2,12 +2,13 @@ package controller
 
 import (
 	"gin-cli/app/service/domain"
+	"gin-cli/app/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func CreateDomain(c *gin.Context) {
-	db := domain.Queries{}
+	db := domain.New(utils.Pgconn)
 	params := domain.CreateDomainParams{
 		Domain:  "",
 		Status:  0,
@@ -20,7 +21,7 @@ func CreateDomain(c *gin.Context) {
 }
 
 func UpdateDomain(c *gin.Context) {
-	db := domain.Queries{}
+	db := domain.New(utils.Pgconn)
 	params := domain.UpdateDomainParams{
 		ID:      0,
 		Domain:  "",
@@ -34,7 +35,7 @@ func UpdateDomain(c *gin.Context) {
 }
 
 func DeleteDomain(c *gin.Context) {
-	db := domain.Queries{}
+	db := domain.New(utils.Pgconn)
 	err := db.DeleteDomain(c, 1)
 	if err != nil {
 		return
@@ -45,7 +46,7 @@ func DeleteDomain(c *gin.Context) {
 }
 
 func GetDomainDetail(c *gin.Context) {
-	db := domain.Queries{}
+	db := domain.New(utils.Pgconn)
 	params := domain.GetDomainDetailParams{
 		Limit:  0,
 		Offset: 0,
