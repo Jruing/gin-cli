@@ -1,4 +1,4 @@
-package router
+package controller
 
 import (
 	"gin-cli/app/service/role"
