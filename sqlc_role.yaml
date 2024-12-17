@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "app/service/role/query.sql"
+    schema: "app/service/role/schema.sql"
+    gen:
+      go:
+        package: "role"
+        out: "app/service/role"
+        sql_package: "pgx/v5"
