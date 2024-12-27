@@ -1,17 +1,12 @@
-[postgres]
-host = "localhost"
-port = 5432
-user = "admin"
-password = "password"
-
 [mysql]
-host = "localhost"
-port = 5432
-user = "admin"
-password = "password"
+host = "81.71.155.218"
+port = 31007
+user = "root"
+password = "test1234"
+db = "gin_cli"
 
 [redis]
-host = "localhost"
-port = 5432
-password = "password"
+host = "81.71.155.218"
+port = 31006
+password = "test1234"
 db = 0

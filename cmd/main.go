@@ -31,30 +31,28 @@ func main() {
 	r.Static("/static", "template/static")
 	r.StaticFS("/pages/", http.Dir("template/pages"))
 	r.StaticFile("/", "template/index.html")
-
-	user := r.Group("/user")
+	//user := r.Group("/user")
+	//{
+	//	user.GET("/user/all", controller.GetUserDetail)
+	//	user.GET("/user/:id", controller.GetUserDetail)
+	//	user.PUT("/user/:id", controller.UpdateUser)
+	//	user.POST("/user/", controller.CreateUser)
+	//	user.DELETE("/user/:id", controller.DeleteUser)
+	//}
+	//role := r.Group("/user")
+	//{
+	//	role.GET("/role/all", controller.GetRoleDetail)
+	//	role.GET("/role/:id", controller.GetRoleDetail)
+	//	role.PUT("/role/:id", controller.UpdateRole)
+	//	role.POST("/role/", controller.CreateUser)
+	//	role.DELETE("/role/:id", controller.DeleteRole)
+	//}
+	domain := r.Group("/domain")
 	{
-		user.GET("/user/all", controller.GetUserDetail)
-		user.GET("/user/:id", controller.GetUserDetail)
-		user.PUT("/user/:id", controller.UpdateUser)
-		user.POST("/user/", controller.CreateUser)
-		user.DELETE("/user/:id", controller.DeleteUser)
-	}
-	role := r.Group("/user")
-	{
-		role.GET("/role/all", controller.GetRoleDetail)
-		role.GET("/role/:id", controller.GetRoleDetail)
-		role.PUT("/role/:id", controller.UpdateRole)
-		role.POST("/role/", controller.CreateUser)
-		role.DELETE("/role/:id", controller.DeleteRole)
-	}
-	domain := r.Group("/user")
-	{
-		domain.GET("/domain/all", controller.GetDomainDetail)
-		domain.GET("/domain/:id", controller.GetDomainDetail)
-		domain.PUT("/domain/:id", controller.UpdateDomain)
-		domain.POST("/domain/", controller.CreateDomain)
-		domain.DELETE("/domain/:id", controller.DeleteDomain)
+		domain.POST("/detail", controller.GetDomainDetail)
+		//domain.PUT("/domain/:id", controller.UpdateDomain)
+		domain.POST("/create", controller.CreateDomain)
+		domain.POST("/delete", controller.DeleteDomain)
 	}
 
 	// 启动服务

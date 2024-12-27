@@ -1,71 +1,123 @@
 package controller
 
 import (
-	"gin-cli/app/service/domain"
+	"fmt"
+	"gin-cli/app/dal/model"
+	"gin-cli/app/dal/query"
 	"gin-cli/app/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgtype"
+	"time"
 )
 
 func CreateDomain(c *gin.Context) {
-	db := domain.New(utils.Pgconn)
-	params := domain.CreateDomainParams{
+	jsondata := make(map[string]interface{})
+	_ = c.BindJSON(&jsondata)
+	query.SetDefault(utils.MysqlClient)
+	params := model.Domain{
 		Domain:  "",
 		Status:  0,
-		Created: pgtype.Timestamp{},
+		Created: time.Time{},
 	}
-	_, err := db.CreateDomain(c, params)
-	if err != nil {
-		return
-	}
-}
 
-func UpdateDomain(c *gin.Context) {
-	db := domain.New(utils.Pgconn)
-	params := domain.UpdateDomainParams{
-		ID:      0,
-		Domain:  "",
-		Status:  0,
-		Created: pgtype.Timestamp{},
+	if domainname, ok := jsondata["domain"]; ok {
+		params.Domain = domainname.(string)
 	}
-	err := db.UpdateDomain(c, params)
-	if err != nil {
-		return
-	}
-}
 
-func DeleteDomain(c *gin.Context) {
-	db := domain.New(utils.Pgconn)
-	err := db.DeleteDomain(c, 1)
+	if status, ok := jsondata["status"]; ok {
+		params.Status = int32(status.(float64))
+	}
+
+	params.Created = time.Now()
+	err := query.Domain.WithContext(c).Create(&params)
+
 	if err != nil {
 		return
 	}
 	c.JSON(200, gin.H{
-		"msg": "查询成功",
+		"code": utils.Success,
+		"msg":  "域新增成功",
+	})
+}
+
+func UpdateDomain(c *gin.Context) {
+	jsondata := make(map[string]interface{})
+	_ = c.Bind(jsondata)
+	query.SetDefault(utils.MysqlClient)
+	params := model.Domain{
+		ID:      0,
+		Domain:  "",
+		Status:  0,
+		Created: time.Time{},
+	}
+	if id, ok := jsondata["id"]; ok {
+		params.ID = id.(int64)
+	}
+
+	if domainname, ok := jsondata["domain"]; ok {
+		params.Domain = domainname.(string)
+	}
+
+	if status, ok := jsondata["domain"]; ok {
+		params.Status = status.(int32)
+	}
+
+	//err := query.Domain.WithContext(c).Where(query.Domain.ID.Eq(params.ID)).Update()
+	//if err != nil {
+	//	return
+	//}
+	c.JSON(200, gin.H{
+		"code": utils.Success,
+		"msg":  "域信息更新成功",
+	})
+}
+
+func DeleteDomain(c *gin.Context) {
+	jsondata := make(map[string]interface{})
+	_ = c.Bind(&jsondata)
+	query.SetDefault(utils.MysqlClient)
+
+	var domainid int64
+	if id, ok := jsondata["id"]; ok {
+		domainid = int64(id.(float64))
+	}
+	info, err := query.Domain.WithContext(c).Where(query.Domain.ID.Eq(domainid)).Delete()
+	if err != nil {
+		return
+	}
+	fmt.Println("删除条数", info.RowsAffected)
+	c.JSON(200, gin.H{
+		"code": utils.Success,
+		"msg":  "域删除成功",
+		"data": info,
 	})
 }
 
 func GetDomainDetail(c *gin.Context) {
-	db := domain.New(utils.Pgconn)
-	params := domain.GetDomainDetailParams{
-		Limit:  0,
-		Offset: 0,
+	jsondata := make(map[string]interface{})
+	_ = c.Bind(&jsondata)
+	query.SetDefault(utils.MysqlClient)
+	q := query.Domain.WithContext(c).Where()
+	var Limit int
+	if limit, ok := jsondata["limit"]; ok {
+		Limit = int(limit.(float64))
+		q.Limit(Limit)
 	}
-	detail, err := db.GetDomainDetail(c, params)
+	if page, ok := jsondata["page"]; ok {
+		q.Offset((int(page.(float64)) - 1) * Limit)
+	}
+	find, err := q.Select(query.Domain.Domain)
 	if err != nil {
 		return
 	}
-	count_params := domain.GetDomainDetailParams{
-		Column1: "",
-		Limit:   0,
-		Offset:  0,
-	}
-	count, err := db.GetDomainDetail(c, count_params)
+	count, err := q.Count()
 	if err != nil {
 		return
 	}
+
 	c.JSON(200, gin.H{
-		"data":  detail,
+		"code":  utils.Success,
+		"msg":   "域名列表查询成功",
+		"data":  find,
 		"count": count,
 	})
 }
