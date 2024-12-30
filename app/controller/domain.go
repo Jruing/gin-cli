@@ -105,7 +105,7 @@ func GetDomainDetail(c *gin.Context) {
 	if page, ok := jsondata["page"]; ok {
 		q.Offset((int(page.(float64)) - 1) * Limit)
 	}
-	find, err := q.Select(query.Domain.Domain)
+	find, err := q.Columns(query.Domain.ID.Eq("1"))
 	if err != nil {
 		return
 	}

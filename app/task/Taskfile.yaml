@@ -1,0 +1,18 @@
+version: "3"
+
+tasks:
+  all_build:
+    cmds:
+      - echo "开始全平台构建"
+      - echo "开始构建linux环境"
+      - echo "切换环境变量为linux环境"
+      - go env -w GOOS=linux
+      - go build -o $output main.go
+      - echo "linux 构建完成"
+      - echo "开始构建windows环境"
+      - echo "切换环境变量为windows环境"
+      - go env -w GOOS=windows
+      - go build -o $output.exe main.go
+      - echo "windows 构建完成"
+    env:
+      output: server
