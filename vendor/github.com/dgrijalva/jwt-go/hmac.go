@@ -6,7 +6,7 @@ import (
 	"errors"
 )
 
-// SigningMethodHMAC implements the HMAC-SHA family of signing methods.
+// Implements the HMAC-SHA family of signing methods signing methods
 // Expects key type of []byte for both signing and validation
 type SigningMethodHMAC struct {
 	Name string
@@ -45,21 +45,18 @@ func (m *SigningMethodHMAC) Alg() string {
 	return m.Name
 }
 
-// Verify implements token verification for the SigningMethod. Returns nil if
-// the signature is valid. Key must be []byte.
-//
-// Note it is not advised to provide a []byte which was converted from a 'human
-// readable' string using a subset of ASCII characters. To maximize entropy, you
-// should ideally be providing a []byte key which was produced from a
-// cryptographically random source, e.g. crypto/rand. Additional information
-// about this, and why we intentionally are not supporting string as a key can
-// be found on our usage guide
-// https://golang-jwt.github.io/jwt/usage/signing_methods/#signing-methods-and-key-types.
-func (m *SigningMethodHMAC) Verify(signingString string, sig []byte, key interface{}) error {
+// Verify the signature of HSXXX tokens.  Returns nil if the signature is valid.
+func (m *SigningMethodHMAC) Verify(signingString, signature string, key interface{}) error {
 	// Verify the key is the right type
 	keyBytes, ok := key.([]byte)
 	if !ok {
-		return newError("HMAC verify expects []byte", ErrInvalidKeyType)
+		return ErrInvalidKeyType
+	}
+
+	// Decode signature, for comparison
+	sig, err := DecodeSegment(signature)
+	if err != nil {
+		return err
 	}
 
 	// Can we use the specified hashing method?
@@ -80,25 +77,19 @@ func (m *SigningMethodHMAC) Verify(signingString string, sig []byte, key interfa
 	return nil
 }
 
-// Sign implements token signing for the SigningMethod. Key must be []byte.
-//
-// Note it is not advised to provide a []byte which was converted from a 'human
-// readable' string using a subset of ASCII characters. To maximize entropy, you
-// should ideally be providing a []byte key which was produced from a
-// cryptographically random source, e.g. crypto/rand. Additional information
-// about this, and why we intentionally are not supporting string as a key can
-// be found on our usage guide https://golang-jwt.github.io/jwt/usage/signing_methods/.
-func (m *SigningMethodHMAC) Sign(signingString string, key interface{}) ([]byte, error) {
+// Implements the Sign method from SigningMethod for this signing method.
+// Key must be []byte
+func (m *SigningMethodHMAC) Sign(signingString string, key interface{}) (string, error) {
 	if keyBytes, ok := key.([]byte); ok {
 		if !m.Hash.Available() {
-			return nil, ErrHashUnavailable
+			return "", ErrHashUnavailable
 		}
 
 		hasher := hmac.New(m.Hash.New, keyBytes)
 		hasher.Write([]byte(signingString))
 
-		return hasher.Sum(nil), nil
+		return EncodeSegment(hasher.Sum(nil)), nil
 	}
 
-	return nil, newError("HMAC sign expects []byte", ErrInvalidKeyType)
+	return "", ErrInvalidKeyType
 }

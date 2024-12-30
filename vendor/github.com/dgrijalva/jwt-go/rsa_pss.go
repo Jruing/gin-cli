@@ -1,4 +1,3 @@
-//go:build go1.4
 // +build go1.4
 
 package jwt
@@ -9,18 +8,13 @@ import (
 	"crypto/rsa"
 )
 
-// SigningMethodRSAPSS implements the RSAPSS family of signing methods signing methods
+// Implements the RSAPSS family of signing methods signing methods
 type SigningMethodRSAPSS struct {
 	*SigningMethodRSA
 	Options *rsa.PSSOptions
-	// VerifyOptions is optional. If set overrides Options for rsa.VerifyPPS.
-	// Used to accept tokens signed with rsa.PSSSaltLengthAuto, what doesn't follow
-	// https://tools.ietf.org/html/rfc7518#section-3.5 but was used previously.
-	// See https://github.com/dgrijalva/jwt-go/issues/285#issuecomment-437451244 for details.
-	VerifyOptions *rsa.PSSOptions
 }
 
-// Specific instances for RS/PS and company.
+// Specific instances for RS/PS and company
 var (
 	SigningMethodPS256 *SigningMethodRSAPSS
 	SigningMethodPS384 *SigningMethodRSAPSS
@@ -30,15 +24,13 @@ var (
 func init() {
 	// PS256
 	SigningMethodPS256 = &SigningMethodRSAPSS{
-		SigningMethodRSA: &SigningMethodRSA{
+		&SigningMethodRSA{
 			Name: "PS256",
 			Hash: crypto.SHA256,
 		},
-		Options: &rsa.PSSOptions{
-			SaltLength: rsa.PSSSaltLengthEqualsHash,
-		},
-		VerifyOptions: &rsa.PSSOptions{
+		&rsa.PSSOptions{
 			SaltLength: rsa.PSSSaltLengthAuto,
+			Hash:       crypto.SHA256,
 		},
 	}
 	RegisterSigningMethod(SigningMethodPS256.Alg(), func() SigningMethod {
@@ -47,15 +39,13 @@ func init() {
 
 	// PS384
 	SigningMethodPS384 = &SigningMethodRSAPSS{
-		SigningMethodRSA: &SigningMethodRSA{
+		&SigningMethodRSA{
 			Name: "PS384",
 			Hash: crypto.SHA384,
 		},
-		Options: &rsa.PSSOptions{
-			SaltLength: rsa.PSSSaltLengthEqualsHash,
-		},
-		VerifyOptions: &rsa.PSSOptions{
+		&rsa.PSSOptions{
 			SaltLength: rsa.PSSSaltLengthAuto,
+			Hash:       crypto.SHA384,
 		},
 	}
 	RegisterSigningMethod(SigningMethodPS384.Alg(), func() SigningMethod {
@@ -64,15 +54,13 @@ func init() {
 
 	// PS512
 	SigningMethodPS512 = &SigningMethodRSAPSS{
-		SigningMethodRSA: &SigningMethodRSA{
+		&SigningMethodRSA{
 			Name: "PS512",
 			Hash: crypto.SHA512,
 		},
-		Options: &rsa.PSSOptions{
-			SaltLength: rsa.PSSSaltLengthEqualsHash,
-		},
-		VerifyOptions: &rsa.PSSOptions{
+		&rsa.PSSOptions{
 			SaltLength: rsa.PSSSaltLengthAuto,
+			Hash:       crypto.SHA512,
 		},
 	}
 	RegisterSigningMethod(SigningMethodPS512.Alg(), func() SigningMethod {
@@ -80,15 +68,23 @@ func init() {
 	})
 }
 
-// Verify implements token verification for the SigningMethod.
+// Implements the Verify method from SigningMethod
 // For this verify method, key must be an rsa.PublicKey struct
-func (m *SigningMethodRSAPSS) Verify(signingString string, sig []byte, key interface{}) error {
+func (m *SigningMethodRSAPSS) Verify(signingString, signature string, key interface{}) error {
+	var err error
+
+	// Decode the signature
+	var sig []byte
+	if sig, err = DecodeSegment(signature); err != nil {
+		return err
+	}
+
 	var rsaKey *rsa.PublicKey
 	switch k := key.(type) {
 	case *rsa.PublicKey:
 		rsaKey = k
 	default:
-		return newError("RSA-PSS verify expects *rsa.PublicKey", ErrInvalidKeyType)
+		return ErrInvalidKey
 	}
 
 	// Create hasher
@@ -98,29 +94,24 @@ func (m *SigningMethodRSAPSS) Verify(signingString string, sig []byte, key inter
 	hasher := m.Hash.New()
 	hasher.Write([]byte(signingString))
 
-	opts := m.Options
-	if m.VerifyOptions != nil {
-		opts = m.VerifyOptions
-	}
-
-	return rsa.VerifyPSS(rsaKey, m.Hash, hasher.Sum(nil), sig, opts)
+	return rsa.VerifyPSS(rsaKey, m.Hash, hasher.Sum(nil), sig, m.Options)
 }
 
-// Sign implements token signing for the SigningMethod.
+// Implements the Sign method from SigningMethod
 // For this signing method, key must be an rsa.PrivateKey struct
-func (m *SigningMethodRSAPSS) Sign(signingString string, key interface{}) ([]byte, error) {
+func (m *SigningMethodRSAPSS) Sign(signingString string, key interface{}) (string, error) {
 	var rsaKey *rsa.PrivateKey
 
 	switch k := key.(type) {
 	case *rsa.PrivateKey:
 		rsaKey = k
 	default:
-		return nil, newError("RSA-PSS sign expects *rsa.PrivateKey", ErrInvalidKeyType)
+		return "", ErrInvalidKeyType
 	}
 
 	// Create the hasher
 	if !m.Hash.Available() {
-		return nil, ErrHashUnavailable
+		return "", ErrHashUnavailable
 	}
 
 	hasher := m.Hash.New()
@@ -128,8 +119,8 @@ func (m *SigningMethodRSAPSS) Sign(signingString string, key interface{}) ([]byt
 
 	// Sign the string and return the encoded bytes
 	if sigBytes, err := rsa.SignPSS(rand.Reader, rsaKey, m.Hash, hasher.Sum(nil), m.Options); err == nil {
-		return sigBytes, nil
+		return EncodeSegment(sigBytes), nil
 	} else {
-		return nil, err
+		return "", err
 	}
 }

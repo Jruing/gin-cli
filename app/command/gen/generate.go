@@ -3,7 +3,6 @@ package main
 // gorm gen configure
 
 import (
-	"gin-cli/app/dal/model"
 	"gin-cli/app/utils"
 
 	"gorm.io/gen"
@@ -47,7 +46,8 @@ func main() {
 	// 也可以手动指定需要生成代码的数据表
 	g.ApplyBasic(g.GenerateAllTable()...)
 
-	g.ApplyInterface(func(Querier) {}, model.User{}, model.User{}, model.Role{})
+	// 自定义通用方法生成
+	// g.ApplyInterface(func(Querier) {}, model.User{}, model.User{}, model.Role{})
 
 	// 执行并生成代码
 	g.Execute()
