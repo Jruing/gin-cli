@@ -1,114 +1,148 @@
 package controller
 
 import (
+	"fmt"
+	"gin-cli/app/dal/model"
+	"gin-cli/app/dal/query"
 	"gin-cli/app/utils"
+	"time"
+
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgtype"
-	"strconv"
 )
-import "gin-cli/app/service/user"
 
-// @Summary 创建用户
-// @Description 创建用户
-// @ID create-user
-// @Accept  json
-// @Produce  json
-// @Param nickname form string true "昵称"
-// @Param username form string true "用户名"
-// @Param password form string true "密码"
-// @Success 200 {object} controllers.user
-// @Router /users/createuser [post]
-
-// 新增用户
 func CreateUser(c *gin.Context) {
-	db := user.New(utils.Pgconn)
-	json := make(map[string]interface{})
-	err := c.BindJSON(&json)
-	params := user.CreateUserParams{
-		Nickname: pgtype.Text{},
-		Username: json["username"].(string),
-		Password: json["password"].(string),
-		Sex:      pgtype.Text{},
-		Email:    json["email"].(string),
-		Status:   json["staus"].(int32),
-		Created:  pgtype.Timestamp{},
-	}
-	err := db.CreateUser(c, params)
-	if err != nil {
-		return
-	}
+	jsondata := make(map[string]interface{})
+	_ = c.BindJSON(&jsondata)
+	query.SetDefault(utils.MysqlClient)
+	params := model.User{}
 
-}
-
-// 更新用户信息
-func UpdateUser(c *gin.Context) {
-	db := user.New(utils.Pgconn)
-	id := c.Param("id")
-	userid, _ := strconv.ParseInt(id, 10, 32)
-	json := make(map[string]interface{})
-	err := c.BindJSON(&json)
-	params := user.UpdateUserParams{
-		ID:       int32(userid),
-		Nickname: pgtype.Text{},
-		Username: json["username"].(string),
-		Password: json["password"].(string),
-		Sex:      pgtype.Text{},
-		Email:    json["email"].(string),
-		Status:   json["status"].(int32),
+	if username, ok := jsondata["username"]; ok {
+		params.Username = username.(string)
 	}
-	err = db.UpdateUser(c, params)
-	if err != nil {
-		return
+	if nickname, ok := jsondata["nickname"]; ok {
+		params.Nickname = nickname.(string)
 	}
-}
+	if password, ok := jsondata["password"]; ok {
+		params.Password = password.(string)
+	}
+	if email, ok := jsondata["email"]; ok {
+		params.Email = email.(string)
+	}
+	if sex, ok := jsondata["sex"]; ok {
+		params.Sex = sex.(string)
+	}
+	if status, ok := jsondata["status"]; ok {
+		params.Status = int32(status.(float64))
+	}
+	params.Created = time.Now()
+	err := query.User.WithContext(c).Create(&params)
 
-// 删除用户
-func DeleteUser(c *gin.Context) {
-	db := user.New(utils.Pgconn)
-	id := c.Param("id")
-	userid, _ := strconv.ParseInt(id, 10, 32)
-	err := db.DeleteUser(c, int32(userid))
 	if err != nil {
 		return
 	}
 	c.JSON(200, gin.H{
-		"msg": "删除成功",
+		"code": utils.Success,
+		"msg":  "用户新增成功",
 	})
 }
 
-// 获取用户详情
-func GetUserDetail(c *gin.Context) {
-	nickname := c.Param("nickname")
-	username := c.Param("username")
-	page := c.Param("page")
-	limit := c.Param("limit")
-	limit1, err := strconv.ParseInt(limit, 10, 32)
-	page1, err := strconv.ParseInt(page, 10, 32)
-
-	db := user.New(utils.Pgconn)
-	params := user.GetUserDetailParams{
-		Column1: nickname,
-		Column2: username,
-		Limit:   int32(limit1),
-		Offset:  (int32(page1) - 1) * int32(limit1),
+func UpdateUser(c *gin.Context) {
+	jsondata := make(map[string]interface{})
+	_ = c.Bind(jsondata)
+	query.SetDefault(utils.MysqlClient)
+	params := model.User{}
+	if id, ok := jsondata["id"]; ok {
+		params.ID = id.(int64)
 	}
-	detail, err := db.GetUserDetail(c, params)
+	if username, ok := jsondata["username"]; ok {
+		params.Username = username.(string)
+	}
+	if nickname, ok := jsondata["nickname"]; ok {
+		params.Nickname = nickname.(string)
+	}
+	if password, ok := jsondata["password"]; ok {
+		params.Password = password.(string)
+	}
+	if email, ok := jsondata["email"]; ok {
+		params.Email = email.(string)
+	}
+	if sex, ok := jsondata["sex"]; ok {
+		params.Sex = sex.(string)
+	}
+	if status, ok := jsondata["status"]; ok {
+		params.Status = int32(status.(float64))
+	}
+	info, err := query.User.WithContext(c).Where(query.User.ID.Eq(params.ID)).Updates(&params)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("更新条数", info.RowsAffected)
+	c.JSON(200, gin.H{
+		"code": utils.Success,
+		"msg":  "域信息更新成功",
+		"data": info.RowsAffected,
+	})
+}
+
+func DeleteUser(c *gin.Context) {
+	jsondata := make(map[string]interface{})
+	_ = c.Bind(&jsondata)
+	query.SetDefault(utils.MysqlClient)
+
+	var userid int64
+	if id, ok := jsondata["id"]; ok {
+		userid = int64(id.(float64))
+	}
+	info, err := query.User.WithContext(c).Where(query.Domain.ID.Eq(userid)).Delete()
 	if err != nil {
 		return
 	}
-	count_params := user.GetUserCountParams{
-		Column1: nickname,
-		Column2: username,
-	}
-	count, err := db.GetUserCount(c, count_params)
-	if err != nil {
-		c.JSON(0, gin.H{
-			"data": []string{},
-			"msg":  "未查询到数据",
-		})
-	}
+	fmt.Println("删除条数", info.RowsAffected)
 	c.JSON(200, gin.H{
-		"data":  detail,
+		"code": utils.Success,
+		"msg":  "用户删除成功",
+		"data": info,
+	})
+}
+
+func GetUserDetail(c *gin.Context) {
+	jsondata := make(map[string]interface{})
+	_ = c.Bind(&jsondata)
+	query.SetDefault(utils.MysqlClient)
+	q := query.User.WithContext(c)
+	for key, value := range jsondata {
+		switch key {
+			case "id":
+				q.Where(query.User.ID.Eq(int64(value.(float64))))
+			case "username":
+				q.Where(query.User.Username.Eq(value.(string)))
+			case "nickname":
+				q.Where(query.User.Nickname.Eq(value.(string)))
+			case "sex":
+				q.Where(query.User.Sex.Eq(value.(string)))
+		}
+	}
+	var Limit int
+	if limit, ok := jsondata["limit"]; ok {
+		Limit = int(limit.(float64))
+		q.Limit(Limit)
+	}
+	if page, ok := jsondata["page"]; ok {
+		q.Offset((int(page.(float64)) - 1) * Limit)
+	}
+	find, err := q.Select(query.User.ID, query.User.Nickname, query.User.Username, query.User.Sex, query.User.Email, query.User.Status).Find()
+	if err != nil {
+		return
+	}
+	count, err := q.Count()
+	if err != nil {
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"code":  utils.Success,
+		"msg":   "用户列表查询成功",
+		"data":  find,
 		"count": count,
 	})
 }

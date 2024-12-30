@@ -10,100 +10,86 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateDomain(c *gin.Context) {
+func CreateRole(c *gin.Context) {
 	jsondata := make(map[string]interface{})
 	_ = c.BindJSON(&jsondata)
 	query.SetDefault(utils.MysqlClient)
-	params := model.Domain{
-		Domain:  "",
-		Status:  0,
-		Created: time.Time{},
+	params := model.Role{}
+	if rolename, ok := jsondata["rolename"]; ok {
+		params.Rolename = rolename.(string)
 	}
-
-	if domainname, ok := jsondata["domain"]; ok {
-		params.Domain = domainname.(string)
-	}
-
 	if status, ok := jsondata["status"]; ok {
 		params.Status = int32(status.(float64))
 	}
-
 	params.Created = time.Now()
-	err := query.Domain.WithContext(c).Create(&params)
-
+	err := query.Role.WithContext(c).Create(&params)
 	if err != nil {
 		return
 	}
 	c.JSON(200, gin.H{
 		"code": utils.Success,
-		"msg":  "域新增成功",
+		"msg":  "角色新增成功",
 	})
 }
 
-func UpdateDomain(c *gin.Context) {
+func UpdateRole(c *gin.Context) {
 	jsondata := make(map[string]interface{})
 	_ = c.Bind(jsondata)
 	query.SetDefault(utils.MysqlClient)
-	params := model.Domain{
-		ID:      0,
-		Domain:  "",
-		Status:  0,
-		Created: time.Time{},
-	}
+	params := model.Role{}
 	if id, ok := jsondata["id"]; ok {
 		params.ID = id.(int64)
 	}
-
-	if domainname, ok := jsondata["domain"]; ok {
-		params.Domain = domainname.(string)
+	if rolename, ok := jsondata["rolename"]; ok {
+		params.Rolename = rolename.(string)
 	}
-
-	if status, ok := jsondata["domain"]; ok {
+	if status, ok := jsondata["status"]; ok {
 		params.Status = status.(int32)
 	}
-
-	//err := query.Domain.WithContext(c).Where(query.Domain.ID.Eq(params.ID)).Update()
-	//if err != nil {
-	//	return
-	//}
+	info, err := query.Role.WithContext(c).Where(query.Role.ID.Eq(params.ID)).Updates(&params)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("更新条数", info.RowsAffected)
 	c.JSON(200, gin.H{
 		"code": utils.Success,
-		"msg":  "域信息更新成功",
+		"msg":  "角色信息更新成功",
+		"data": info.RowsAffected,
 	})
 }
 
-func DeleteDomain(c *gin.Context) {
+func DeleteRole(c *gin.Context) {
 	jsondata := make(map[string]interface{})
 	_ = c.Bind(&jsondata)
 	query.SetDefault(utils.MysqlClient)
 
-	var domainid int64
+	var roleid int64
 	if id, ok := jsondata["id"]; ok {
-		domainid = int64(id.(float64))
+		roleid = int64(id.(float64))
 	}
-	info, err := query.Domain.WithContext(c).Where(query.Domain.ID.Eq(domainid)).Delete()
+	info, err := query.Role.WithContext(c).Where(query.Role.ID.Eq(roleid)).Delete()
 	if err != nil {
 		return
 	}
 	fmt.Println("删除条数", info.RowsAffected)
 	c.JSON(200, gin.H{
 		"code": utils.Success,
-		"msg":  "域删除成功",
+		"msg":  "角色删除成功",
 		"data": info,
 	})
 }
 
-func GetDomainDetail(c *gin.Context) {
+func GetRoleDetail(c *gin.Context) {
 	jsondata := make(map[string]interface{})
 	_ = c.Bind(&jsondata)
 	query.SetDefault(utils.MysqlClient)
-	q := query.Domain.WithContext(c)
+	q := query.Role.WithContext(c)
 	for key, value := range jsondata {
 		switch key {
-		case "domain":
-			q.Where(query.Domain.Domain.Eq(value.(string)))
+		case "rolename":
+			q.Where(query.Role.Rolename.Eq(value.(string)))
 		case "status":
-			q.Where(query.Domain.Status.Eq(int32(value.(float64))))
+			q.Where(query.Role.Status.Eq(int32(value.(float64))))
 		}
 	}
 	var Limit int
@@ -114,7 +100,7 @@ func GetDomainDetail(c *gin.Context) {
 	if page, ok := jsondata["page"]; ok {
 		q.Offset((int(page.(float64)) - 1) * Limit)
 	}
-	find, err := q.Select(query.Domain.ID, query.Domain.Domain, query.Domain.Status).Find()
+	find, err := q.Select(query.Role.ALL).Find()
 	if err != nil {
 		return
 	}
@@ -125,7 +111,7 @@ func GetDomainDetail(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"code":  utils.Success,
-		"msg":   "域名列表查询成功",
+		"msg":   "角色列表查询成功",
 		"data":  find,
 		"count": count,
 	})
