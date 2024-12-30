@@ -138,7 +138,7 @@ func GetUserDetail(c *gin.Context) {
 	if err != nil {
 		return
 	}
-
+	
 	c.JSON(200, gin.H{
 		"code":  utils.Success,
 		"msg":   "用户列表查询成功",

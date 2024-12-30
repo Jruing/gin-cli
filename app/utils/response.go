@@ -1,9 +1,6 @@
 package utils
 
-import (
-	"github.com/gin-gonic/gin"
-	"net/http"
-)
+import "github.com/gin-gonic/gin"
 
 type DetailResponseStruct struct {
 	Code  int         `json:"code"`
@@ -12,18 +9,10 @@ type DetailResponseStruct struct {
 	Count int         `json:"count"`
 }
 
-// 定义一个处理函数，返回自定义格式的数据
-func DetailResponse(c *gin.Context) {
-	// 数据
-	data := map[string]string{
-		"key": "value",
-	}
-
-	// 返回自定义格式的响应
-	c.JSON(http.StatusOK, DetailResponseStruct{
-		Code:  http.StatusOK,
-		Msg:   "成功",
-		Data:  data,
-		Count: 20,
-	})
+func (d DetailResponseStruct) Response(c *gin.Context) {
+	d.Code = Success
+	d.Msg = "success"
+	d.Data = nil
+	d.Count = 0
+	c.JSON(200, d)
 }

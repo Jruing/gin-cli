@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 
 	"github.com/casbin/casbin/v2"
@@ -24,8 +25,8 @@ func init() {
 	if err != nil {
 		panic("err")
 	}
-	fmt.Println(viper.GetString("database.server"))
 
+	// Mysql配置文件
 	mysqlHost := viper.GetString("mysql.host")
 	mysqlPort := viper.GetInt("mysql.port")
 	mysqlUser := viper.GetString("mysql.user")
